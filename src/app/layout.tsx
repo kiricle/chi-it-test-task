@@ -1,7 +1,7 @@
 import './globals.scss';
 import { Fira_Sans } from 'next/font/google';
 import Footer from './layout/Footer/Footer';
-import Head from 'next/head';
+import { Metadata } from 'next';
 
 const firaSans = Fira_Sans({
     subsets: ['latin'],
@@ -9,7 +9,7 @@ const firaSans = Fira_Sans({
     weight: ['400', '700'],
 });
 
-const metadata = {
+export const metadata: Metadata = {
     title: 'CHI IT Test Task',
     description: 'Table with cars list',
 };
@@ -21,22 +21,6 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <Head>
-                <meta charSet="utf-8" />
-                <meta
-                    name="description"
-                    content={metadata.description}
-                />
-                <meta
-                    name="viewport"
-                    content="width=device-width"
-                />
-                <title>{metadata.title}</title>
-                <link
-                    rel="shortcut icon"
-                    href="/favicon.ico"
-                />
-            </Head>
             <body className={firaSans.className}>
                 {children}
                 <Footer />
