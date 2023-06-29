@@ -1,0 +1,37 @@
+.button {
+    padding: 5px 10px;
+    background-color: #44c767;
+    border: 1px solid #18ab29;
+    color: #fff;
+    font-size: 17px;
+    transition: background-color .3s;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #5cbf2a;
+    }
+}
+
+.button:active {
+    position: relative;
+    top: 1px;
+}
+
+.danger {
+    border: 1px solid #933a32;
+    background-color: #f64f3f;
+
+    &:hover {
+        background-color:#bd4338;
+    }
+}
+
+.edit {
+    color: #103785;
+    border: 1px solid #103785;
+    background-color: #fff700;
+
+    &:hover {
+        background-color: #d1cb0b;
+    }
+}

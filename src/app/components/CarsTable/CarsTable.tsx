@@ -1,46 +1,40 @@
-import Car from '@/app/interfaces/Car';
+import styles from './CarsTable.module.scss';
 import CarsTableProps from './CarsTable.props';
+import CarsTableItem from './CarsTableItem/CarsTableItem';
+
+const tableHeaders = [
+    'Company',
+    'Model',
+    'Year',
+    'VIN',
+    'Color',
+    'Price',
+    'Availability',
+    'Actions',
+];
 
 async function CarsTable({ promise }: CarsTableProps) {
-    const {cars} = await promise;
+    const { cars } = await promise;
 
     const carsToShow = cars.slice(0, 10);
 
-    const tableHeader = (
-        <tr>
-            <th>Company</th>
-            <th>Model</th>
-            <th>Year</th>
-            <th>VIN</th>
-            <th>Color</th>
-            <th>Price</th>
-            <th>Availability</th>
-            <th>Actions</th>
-        </tr>
-    );
+    const tableHeader = tableHeaders.map((header) => (
+        <th key={header}>{header}</th>
+    ));
 
-    const tableContent = carsToShow.map((car) => {
-        return (
-            <tr key={car.id}>
-                <td>{car.car}</td>
-                <td>{car.car_model}</td>
-                <td>{car.car_model_year}</td>
-                <td>{car.car_vin}</td>
-                <td>{car.car_color}</td>
-                <td>{car.price}</td>
-                <td>{car.availability}</td>
-                <td>
-                    <button>Edit</button>
-                    <button>Delete</button>
-                </td>
-            </tr>
-        );
-    });
+    const tableContent = carsToShow.map((car) => (
+        <CarsTableItem
+            key={car.id}
+            car={car}
+        />
+    ));
 
     return (
-        <table>
-            {tableHeader}
-            {cars && tableContent}
+        <table className={styles.table}>
+            <thead>
+                <tr>{tableHeader}</tr>
+            </thead>
+            <tbody>{tableContent}</tbody>
         </table>
     );
 }
