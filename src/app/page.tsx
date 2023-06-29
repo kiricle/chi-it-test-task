@@ -9,7 +9,7 @@ export default async function Home() {
     return (
         <main className={styles.main}>
             <h1 className={styles.title}>
-                <a href="https://nextjs.org">CHI IT Test Task!</a>
+                CHI IT Test Task!
             </h1>
 
             <Suspense fallback={<div>Loading...</div>}>
