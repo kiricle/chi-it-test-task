@@ -5,6 +5,7 @@ import Car from '@/app/interfaces/Car';
 import fetchAllCars from '@/app/lib/fetchAllCars';
 import Button from '@/app/ui/Button';
 import { useEffect, useMemo, useState } from 'react';
+import CarsItemForm from '../CarsItemForm/CarsItemForm';
 import ConfirmForm from '../ConfirmForm/ConfirmForm';
 import useModal from '../Modal/hooks/useModal';
 import Modal from '../Modal/Modal';
@@ -26,12 +27,20 @@ function CarsTable() {
     const [isDeleteModalOpen, openDeleteModal, closeDeleteModal] = useModal();
     const [carIdToDelete, setCarIdToDelete] = useState(0);
 
+    const [isUpdateModalOpen, openUpdateModal, closeUpdateModal] = useModal();
+    const [carToBeUpdated, setCarToBeUpdated] = useState<Car | null>(null);
+
     const itemsPerPage = 15;
     const initialCars: Car[] = useMemo(() => [], []);
     const [cars, setCars] = useLocalStorage<Car[]>('cars', initialCars);
     const [totalPages, currentPage, nextPage, previousPage] = usePagination(
         cars,
         itemsPerPage
+    );
+
+    const carsToShow = cars.slice(
+        currentPage * itemsPerPage,
+        (currentPage + 1) * itemsPerPage
     );
 
     useEffect(() => {
@@ -43,18 +52,24 @@ function CarsTable() {
         }
     });
 
-    const carsToShow = cars.slice(
-        currentPage * itemsPerPage,
-        (currentPage + 1) * itemsPerPage
-    );
-
-    const tableHeader = tableHeaders.map((header) => (
-        <th key={header}>{header}</th>
-    ));
-
     const handleDeleteButtonClick = (id: number) => {
         setCarIdToDelete(id);
         openDeleteModal();
+    };
+
+    const handleEditButtonClick = (car: Car) => {
+        setCarToBeUpdated(car);
+        openUpdateModal();
+    };
+
+    const updateCar = (id: number, updatedCar: Car) => {
+        const newCars = cars.map((car) => {
+            if (car.id === id) {
+                return updatedCar;
+            }
+            return car;
+        });
+        setCars(newCars);
     };
 
     const deleteCar = (id: number) => {
@@ -62,23 +77,30 @@ function CarsTable() {
         setCars(newCars);
     };
 
-    const tableContent = carsToShow.map((car) => (
-        <CarsTableItem
-            key={car.id}
-            car={car}
-            onDelete={() => {
-                handleDeleteButtonClick(car.id);
-            }}
-        />
-    ));
-
     return (
         <>
             <table className={styles.table}>
                 <thead>
-                    <tr>{tableHeader}</tr>
+                    <tr>
+                        {tableHeaders.map((header) => (
+                            <th key={header}>{header}</th>
+                        ))}
+                    </tr>
                 </thead>
-                <tbody>{tableContent}</tbody>
+                <tbody>
+                    {carsToShow.map((car) => (
+                        <CarsTableItem
+                            key={car.id}
+                            car={car}
+                            onDelete={() => {
+                                handleDeleteButtonClick(car.id);
+                            }}
+                            onEdit={() => {
+                                handleEditButtonClick(car);
+                            }}
+                        />
+                    ))}
+                </tbody>
             </table>
             <div className={styles.pagination}>
                 <Button
@@ -106,11 +128,23 @@ function CarsTable() {
                     onCancel={closeDeleteModal}
                     onConfirm={(e) => {
                         e.preventDefault();
-                        deleteCar(carIdToDelete)
+                        deleteCar(carIdToDelete);
                         closeDeleteModal();
                     }}
                 />
             </Modal>
+            <Modal
+                isOpen={isUpdateModalOpen}
+                onClose={closeUpdateModal}
+            >
+                <CarsItemForm car={carToBeUpdated} />
+            </Modal>
+            <Button
+                onClick={localStorage.clear}
+                appearance="edit"
+            >
+                Clear localStorage
+            </Button>
         </>
     );
 }
