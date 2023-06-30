@@ -4,7 +4,8 @@ import usePagination from '@/app/hooks/usePagination';
 import Car from '@/app/interfaces/Car';
 import fetchAllCars from '@/app/lib/fetchAllCars';
 import Button from '@/app/ui/Button';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import ConfirmForm from '../ConfirmForm/ConfirmForm';
 import useModal from '../Modal/hooks/useModal';
 import Modal from '../Modal/Modal';
 import styles from './CarsTable.module.scss';
@@ -23,12 +24,15 @@ const tableHeaders = [
 
 function CarsTable() {
     const [isDeleteModalOpen, openDeleteModal, closeDeleteModal] = useModal();
+    const [carIdToDelete, setCarIdToDelete] = useState(0);
 
     const itemsPerPage = 15;
     const initialCars: Car[] = useMemo(() => [], []);
     const [cars, setCars] = useLocalStorage<Car[]>('cars', initialCars);
-    const [totalPages, currentPage, nextPage, previousPage] =
-        usePagination(cars, itemsPerPage);
+    const [totalPages, currentPage, nextPage, previousPage] = usePagination(
+        cars,
+        itemsPerPage
+    );
 
     useEffect(() => {
         if (cars.length === 0) {
@@ -39,7 +43,7 @@ function CarsTable() {
         }
     });
 
-    const carsToShow = cars?.slice(
+    const carsToShow = cars.slice(
         currentPage * itemsPerPage,
         (currentPage + 1) * itemsPerPage
     );
@@ -48,10 +52,23 @@ function CarsTable() {
         <th key={header}>{header}</th>
     ));
 
+    const handleDeleteButtonClick = (id: number) => {
+        setCarIdToDelete(id);
+        openDeleteModal();
+    };
+
+    const deleteCar = (id: number) => {
+        const newCars = cars.filter((car) => car.id !== id);
+        setCars(newCars);
+    };
+
     const tableContent = carsToShow.map((car) => (
         <CarsTableItem
             key={car.id}
             car={car}
+            onDelete={() => {
+                handleDeleteButtonClick(car.id);
+            }}
         />
     ));
 
@@ -84,19 +101,15 @@ function CarsTable() {
                 isOpen={isDeleteModalOpen}
                 onClose={closeDeleteModal}
             >
-                <h1>Are you sure you want to delete item?</h1>
-                <Button
-                    onClick={closeDeleteModal}
-                    appearance="danger"
-                >
-                    Yes
-                </Button>
-                <Button
-                    onClick={closeDeleteModal}
-                    appearance="primary"
-                >
-                    No
-                </Button>
+                <ConfirmForm
+                    message="Are you sure you want to delete this car?"
+                    onCancel={closeDeleteModal}
+                    onConfirm={(e) => {
+                        e.preventDefault();
+                        deleteCar(carIdToDelete)
+                        closeDeleteModal();
+                    }}
+                />
             </Modal>
         </>
     );

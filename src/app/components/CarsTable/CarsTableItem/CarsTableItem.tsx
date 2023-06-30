@@ -4,7 +4,7 @@ import { FC } from 'react';
 import styles from './CarsTableItem.module.scss';
 import CarsTableItemProps from './CarsTableItem.props';
 
-const CarsTableItem: FC<CarsTableItemProps> = ({ car }) => {
+const CarsTableItem: FC<CarsTableItemProps> = ({ car, onDelete }) => {
     return (
         <tr key={car.id}>
             <td>{car.car}</td>
@@ -21,7 +21,7 @@ const CarsTableItem: FC<CarsTableItemProps> = ({ car }) => {
                     Edit
                 </Button>
                 <Button
-                    onClick={() => console.log(123)}
+                    onClick={() => onDelete(car.id)}
                     appearance="danger"
                 >
                     Delete
