@@ -1,7 +1,7 @@
 import { FC, useEffect } from 'react';
 import ModalProps from './Modal.props';
 import styles from './Modal.module.scss';
-import Button from '@/app/ui/Button';
+import Button from '@/app/ui/Button/Button';
 
 const Modal: FC<ModalProps> = ({ isOpen, onClose, children }) => {
     useEffect(() => {

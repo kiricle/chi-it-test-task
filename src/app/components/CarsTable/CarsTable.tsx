@@ -2,9 +2,8 @@
 import useLocalStorage from '@/app/hooks/useLocalStorage';
 import usePagination from '@/app/hooks/usePagination';
 import Car from '@/app/interfaces/Car';
-import fetchAllCars from '@/app/lib/fetchAllCars';
-import Button from '@/app/ui/Button';
-import { useEffect, useMemo, useState } from 'react';
+import Button from '@/app/ui/Button/Button';
+import { useState } from 'react';
 import CarsItemForm from '../CarsItemForm/CarsItemForm';
 import ConfirmForm from '../ConfirmForm/ConfirmForm';
 import useModal from '../Modal/hooks/useModal';
@@ -23,16 +22,20 @@ const tableHeaders = [
     'Actions',
 ];
 
-function CarsTable() {
+function CarsTable({ cars: initialCars }: { cars: Car[] }) {
     const [isDeleteModalOpen, openDeleteModal, closeDeleteModal] = useModal();
-    const [carIdToDelete, setCarIdToDelete] = useState(0);
+    const [carIdToDelete, setCarIdToDelete] = useState('0');
 
     const [isUpdateModalOpen, openUpdateModal, closeUpdateModal] = useModal();
     const [carToBeUpdated, setCarToBeUpdated] = useState<Car | null>(null);
 
+    const [isAddModalOpen, openAddModal, closeAddModal] = useModal();
+
     const itemsPerPage = 15;
-    const initialCars: Car[] = useMemo(() => [], []);
-    const [cars, setCars] = useLocalStorage<Car[]>('cars', initialCars);
+    const [cars, setCars, isLoading] = useLocalStorage<Car[]>(
+        'cars',
+        initialCars
+    );
     const [totalPages, currentPage, nextPage, previousPage] = usePagination(
         cars,
         itemsPerPage
@@ -43,16 +46,7 @@ function CarsTable() {
         (currentPage + 1) * itemsPerPage
     );
 
-    useEffect(() => {
-        if (cars.length === 0) {
-            fetchAllCars().then(({ cars }) => {
-                console.log('Fetched cars', cars);
-                setCars(cars);
-            });
-        }
-    });
-
-    const handleDeleteButtonClick = (id: number) => {
+    const handleDeleteButtonClick = (id: string) => {
         setCarIdToDelete(id);
         openDeleteModal();
     };
@@ -62,20 +56,30 @@ function CarsTable() {
         openUpdateModal();
     };
 
-    const updateCar = (id: number, updatedCar: Car) => {
+    const addCar = (newCar: Car) => {
+        setCars([...cars, newCar]);
+        closeAddModal();
+    };
+
+    const updateCar = (updatedCar: Car) => {
         const newCars = cars.map((car) => {
-            if (car.id === id) {
+            if (car.id === updatedCar.id) {
                 return updatedCar;
             }
             return car;
         });
         setCars(newCars);
+        closeUpdateModal();
     };
 
-    const deleteCar = (id: number) => {
+    const deleteCar = (id: string) => {
         const newCars = cars.filter((car) => car.id !== id);
         setCars(newCars);
     };
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <>
@@ -137,14 +141,26 @@ function CarsTable() {
                 isOpen={isUpdateModalOpen}
                 onClose={closeUpdateModal}
             >
-                <CarsItemForm car={carToBeUpdated} />
+                <CarsItemForm
+                    onSubmit={updateCar}
+                    car={carToBeUpdated}
+                />
             </Modal>
             <Button
-                onClick={localStorage.clear}
+                onClick={openAddModal}
                 appearance="edit"
             >
-                Clear localStorage
+                Create Car
             </Button>
+            <Modal
+                isOpen={isAddModalOpen}
+                onClose={closeAddModal}
+            >
+                <CarsItemForm
+                    car={null}
+                    onSubmit={addCar}
+                />
+            </Modal>
         </>
     );
 }

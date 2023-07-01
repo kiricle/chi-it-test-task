@@ -17,6 +17,14 @@
     transform: scale(.9);
 }
 
+.button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    &:active {
+        transform: none;
+    }
+}
+
 .danger {
     border: 1px solid #933a32;
     background-color: #f64f3f;

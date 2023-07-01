@@ -1,4 +1,4 @@
-import Button from '@/app/ui/Button';
+import Button from '@/app/ui/Button/Button';
 import { FC } from 'react';
 import ConfirmFormProps from './ConfirmForm.props';
 
@@ -23,7 +23,6 @@ const ConfirmForm: FC<ConfirmFormProps> = ({
             >
                 No
             </Button>
-            ;
         </form>
     );
 };

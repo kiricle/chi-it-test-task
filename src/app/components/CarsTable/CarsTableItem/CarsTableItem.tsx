@@ -1,5 +1,5 @@
 'use client';
-import Button from '@/app/ui/Button';
+import Button from '@/app/ui/Button/Button';
 import { FC } from 'react';
 import styles from './CarsTableItem.module.scss';
 import CarsTableItemProps from './CarsTableItem.props';
