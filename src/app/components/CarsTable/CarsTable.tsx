@@ -1,9 +1,12 @@
 'use client';
+import useDebounce from '@/app/hooks/useDebounce';
+import useInput from '@/app/hooks/useInput';
 import useLocalStorage from '@/app/hooks/useLocalStorage';
 import usePagination from '@/app/hooks/usePagination';
 import Car from '@/app/interfaces/Car';
 import Button from '@/app/ui/Button/Button';
-import { useState } from 'react';
+import Input from '@/app/ui/Input/Input';
+import { useEffect, useState } from 'react';
 import CarsItemForm from '../CarsItemForm/CarsItemForm';
 import ConfirmForm from '../ConfirmForm/ConfirmForm';
 import useModal from '../Modal/hooks/useModal';
@@ -36,12 +39,39 @@ function CarsTable({ cars: initialCars }: { cars: Car[] }) {
         'cars',
         initialCars
     );
+    const [filteredCars, setFilteredCars] = useState<Car[]>(cars);
     const [totalPages, currentPage, nextPage, previousPage] = usePagination(
-        cars,
+        filteredCars,
         itemsPerPage
     );
 
-    const carsToShow = cars.slice(
+    const [searchTerm, onChangeSearchTerm] = useInput('');
+
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+        
+    useEffect(() => {
+        setFilteredCars(cars.filter((car) => {
+            const searchTermLowerCase = debouncedSearchTerm.toLowerCase();
+            
+            const companyLowerCase = car.car.toLowerCase();
+            const modelLowerCase = car.car_model.toLowerCase();
+            const yearLowerCase = car.car_model_year.toString().toLowerCase();
+            const vinLowerCase = car.car_vin.toLowerCase();
+            const colorLowerCase = car.car_color.toLowerCase();
+            const priceLowerCase = car.price.toString().toLowerCase();
+
+            return (
+                companyLowerCase.includes(searchTermLowerCase) ||
+                modelLowerCase.includes(searchTermLowerCase) ||
+                yearLowerCase.includes(searchTermLowerCase) ||
+                vinLowerCase.includes(searchTermLowerCase) ||
+                colorLowerCase.includes(searchTermLowerCase) ||
+                priceLowerCase.includes(searchTermLowerCase)
+            );
+        }));
+    }, [debouncedSearchTerm, cars]);
+
+    const carsToShow = filteredCars.slice(
         currentPage * itemsPerPage,
         (currentPage + 1) * itemsPerPage
     );
@@ -80,9 +110,15 @@ function CarsTable({ cars: initialCars }: { cars: Car[] }) {
     if (isLoading) {
         return <div>Loading...</div>;
     }
-
+    
     return (
         <>
+            <Input
+                onChange={onChangeSearchTerm}
+                value={searchTerm}
+                type="search"
+                placeholder="Search"
+            />
             <table className={styles.table}>
                 <thead>
                     <tr>
