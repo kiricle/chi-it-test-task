@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function usePagination<T>(allItems: T[], itemsPerPage: number) {
     const totalPages = Math.ceil((allItems.length - 1) / itemsPerPage);
     const [currentPage, setCurrentPage] = useState(0);
+    
+    useEffect(() => {
+        setCurrentPage(0);
+    },[allItems])
 
     const nextPage = () => {
         setCurrentPage((prev) => {
