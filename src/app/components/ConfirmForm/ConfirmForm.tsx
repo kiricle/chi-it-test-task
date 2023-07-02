@@ -1,6 +1,7 @@
 import Button from '@/app/ui/Button/Button';
 import { FC } from 'react';
 import ConfirmFormProps from './ConfirmForm.props';
+import styles from './ConfirmForm.module.scss';
 
 const ConfirmForm: FC<ConfirmFormProps> = ({
     message,
@@ -10,19 +11,21 @@ const ConfirmForm: FC<ConfirmFormProps> = ({
     return (
         <form>
             <h1>{message}</h1>
-            <Button
-                type="submit"
-                onClick={onConfirm}
-                appearance="danger"
-            >
-                Yes
-            </Button>
-            <Button
-                onClick={onCancel}
-                appearance="primary"
-            >
-                No
-            </Button>
+            <div className={styles.buttons}>
+                <Button
+                    type="submit"
+                    onClick={onConfirm}
+                    appearance="danger"
+                >
+                    Yes
+                </Button>
+                <Button
+                    onClick={onCancel}
+                    appearance="primary"
+                >
+                    No
+                </Button>
+            </div>
         </form>
     );
 };
